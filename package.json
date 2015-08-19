@@ -1,0 +1,12 @@
+{
+  "name": "donation-bot",
+  "description": "A Steam bot that accepts item donations.",
+  "version": "0.0.1",
+  "author": "Alex7Kom",
+  "dependencies": {
+    "steam": "*",
+    "steam-tradeoffers": "*",
+    "steam-web-api-key": "0.0.1",
+    "steam-weblogon": "0.0.3"
+  }
+}

@@ -6,7 +6,8 @@ var SteamWebLogOn = require('steam-weblogon');
 var getSteamAPIKey = require('steam-web-api-key');
 var SteamTradeOffers = require('steam-tradeoffers');
 
-var admin = ''; // put your steamid here so the bot can accept your offers
+// put your steamid here so the bot can accept your offers
+var admin = '';
 
 var logOnOptions = {
   account_name: '',
@@ -14,9 +15,10 @@ var logOnOptions = {
 };
 
 var authCode = ''; // code received by email
+var sentryFileName = 'sentry'; // steam guard data file name
 
 try {
-  logOnOptions.sha_sentryfile = getSHA1(fs.readFileSync('sentry_yui'));
+  logOnOptions.sha_sentryfile = getSHA1(fs.readFileSync(sentryFileName));
 } catch (e) {
   if (authCode !== '') {
     logOnOptions.auth_code = authCode;
@@ -66,8 +68,14 @@ steamClient.on('servers', function(servers) {
 });
 
 steamUser.on('updateMachineAuth', function(sentry, callback) {
-  fs.writeFileSync('sentry', sentry.bytes);
+  fs.writeFileSync(sentryFileName, sentry.bytes);
   callback({ sha_file: getSHA1(sentry.bytes) });
+});
+
+steamUser.on('tradeOffers', function(number) {
+  if (number > 0) {
+    handleOffers();
+  }
 });
 
 function handleOffers() {
@@ -77,6 +85,10 @@ function handleOffers() {
     time_historical_cutoff: Math.round(Date.now() / 1000),
     get_descriptions: 1
   }, function(error, body) {
+    if (error) {
+      log(error);
+    }
+
     if (
       body
       && body.response
@@ -84,20 +96,25 @@ function handleOffers() {
     ) {
       var descriptions = {};
       body.response.descriptions.forEach(function (desc) {
-        descriptions[desc.appid + ';' + desc.classid + ';' + desc.instanceid] = desc;
+        descriptions[
+          desc.appid + ';' + desc.classid + ';' + desc.instanceid
+        ] = desc;
       });
 
-      body.response.trade_offers_received.forEach(function(offer) {
+      body.response.trade_offers_received.forEach(function (offer) {
         if (offer.trade_offer_state !== 2) {
           return;
         }
 
-        var offerMessage = 'Got an offer!\n';
+        var offerMessage = 'Got an offer ' + offer.tradeofferid +
+          ' from ' + offer.steamid_other + '\n';
 
         if (offer.items_to_receive) {
           offerMessage += 'Items to receive: ' +
             offer.items_to_receive.map(function (item) {
-              var desc = descriptions[item.appid + ';' + item.classid + ';' + item.instanceid];
+              var desc = descriptions[
+                item.appid + ';' + item.classid + ';' + item.instanceid
+              ];
               return desc.name + ' (' + desc.type + ')';
             }).join(', ') + '\n';
         }
@@ -105,7 +122,9 @@ function handleOffers() {
         if (offer.items_to_give) {
           offerMessage += 'Items to give: ' +
             offer.items_to_give.map(function (item) {
-              var desc = descriptions[item.appid + ';' + item.classid + ';' + item.instanceid];
+              var desc = descriptions[
+                item.appid + ';' + item.classid + ';' + item.instanceid
+              ];
               return desc.name + ' (' + desc.type + ')';
             }).join(', ') + '\n';
         }
@@ -114,27 +133,25 @@ function handleOffers() {
           offerMessage += 'Message: ' + offer.message;
         }
 
-        console.log(offerMessage);
-        steamFriends.sendMessage(admin, offerMessage);
+        log(offerMessage);
 
-        if (offer.steamid_other === admin
-          || !offer.items_to_give
-        ) {
+        if (offer.steamid_other === admin || !offer.items_to_give) {
           offers.acceptOffer({
             tradeOfferId: offer.tradeofferid
           }, function (error, result) {
             if (error) {
-              console.log(error);
+              log(error);
             }
-            console.log('Offer accepted!');
-            steamFriends.sendMessage(admin, 'Offer accepted!');
+
+            log('Offer ' + offer.tradeofferid + ' accepted');
 
             offers.getOffer({
               tradeofferid: offer.tradeofferid
             }, function (error, result) {
               if (error) {
-                console.log(error);
+                log(error);
               }
+
               if (result
                 && result.response
                 && result.response.offer
@@ -144,15 +161,17 @@ function handleOffers() {
                   tradeId: result.response.offer.tradeid
                 }, function (error, result) {
                   if (error) {
-                    console.log(error);
+                    log(error);
                   }
-                  var items = result.map(function (item) {
-                    return 'http://steamcommunity.com/profiles/' +
-                      item.owner + '/inventory/#' +
-                      item.appid + '_' + item.contextid + '_' + item.id;
-                  }).join(' ');
-                  console.log(items);
-                  steamFriends.sendMessage(admin, items);
+
+                  var items = 'Got items:\n' +
+                    result.map(function (item) {
+                      return 'http://steamcommunity.com/profiles/' +
+                        item.owner + '/inventory/#' +
+                        item.appid + '_' + item.contextid + '_' + item.id;
+                    }).join('\n');
+
+                  log(items);
                 });
               }
             });
@@ -162,10 +181,10 @@ function handleOffers() {
             tradeOfferId: offer.tradeofferid
           }, function (error, result) {
             if (error) {
-              console.log(error);
+              log(error);
             }
-            console.log('Offer declined!');
-            steamFriends.sendMessage(admin, 'Offer declined!');
+
+            log('Offer ' + offer.tradeofferid + ' declined');
           });
         }
       });
@@ -173,13 +192,12 @@ function handleOffers() {
   });
 }
 
-steamUser.on('tradeOffers', function(number) {
-  if (number > 0) {
-    handleOffers();
-  }
-});
+function log (message) {
+  console.log(new Date().toString() + ' - ' + message);
+  steamFriends.sendMessage(admin, message);
+}
 
-function getSHA1(bytes) {
+function getSHA1 (bytes) {
   var shasum = crypto.createHash('sha1');
   shasum.end(bytes);
   return shasum.read();
