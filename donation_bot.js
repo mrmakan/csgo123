@@ -194,7 +194,7 @@ function handleOffers() {
 
 function log (message) {
   console.log(new Date().toString() + ' - ' + message);
-  steamFriends.sendMessage(admin, message);
+  steamFriends.sendMessage(admin, message.toString());
 }
 
 function getSHA1 (bytes) {
