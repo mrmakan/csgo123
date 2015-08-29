@@ -86,7 +86,7 @@ function handleOffers() {
     get_descriptions: 1
   }, function(error, body) {
     if (error) {
-      log(error);
+      return log(error);
     }
 
     if (
@@ -140,7 +140,7 @@ function handleOffers() {
             tradeOfferId: offer.tradeofferid
           }, function (error, result) {
             if (error) {
-              log(error);
+              return log(error);
             }
 
             log('Offer ' + offer.tradeofferid + ' accepted');
@@ -149,7 +149,7 @@ function handleOffers() {
               tradeofferid: offer.tradeofferid
             }, function (error, result) {
               if (error) {
-                log(error);
+                return log(error);
               }
 
               if (result
@@ -161,7 +161,7 @@ function handleOffers() {
                   tradeId: result.response.offer.tradeid
                 }, function (error, result) {
                   if (error) {
-                    log(error);
+                    return log(error);
                   }
 
                   var items = 'Got items:\n' +
@@ -181,7 +181,7 @@ function handleOffers() {
             tradeOfferId: offer.tradeofferid
           }, function (error, result) {
             if (error) {
-              log(error);
+              return log(error);
             }
 
             log('Offer ' + offer.tradeofferid + ' declined');
