@@ -6,7 +6,7 @@ Basically, it accepts any offer that doesn't ask for any items from its inventor
 
 Feel free to use if you want to accept item donations for your project, or modify it as you see fit.
 
-# Install and run
+## Install and run
 
 1. Install the latest [Node.js](https://nodejs.org).
 2. Click 'Download ZIP' button on the right of this page.
@@ -20,6 +20,6 @@ Feel free to use if you want to accept item donations for your project, or modif
 __Note:__ After `sentry` file is created, you'll need to wait for 7-15 days due to [Steam Guard trade restrictions](https://support.steampowered.com/kb_article.php?ref=1047-EDFM-2932).
 __Do NOT delete sentry file!__
 
-# License
+## License
 
 MIT
