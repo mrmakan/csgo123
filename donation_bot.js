@@ -1,3 +1,17 @@
+/* START EDITING */
+
+// Put your 64-bit SteamID here so the bot can accept your offers
+var admin = '';
+
+var logOnOptions = {
+  account_name: '',
+  password: ''
+};
+
+var authCode = ''; // Code received by email
+
+/* STOP EDITING */
+
 var fs = require('fs');
 var crypto = require('crypto');
 
@@ -6,15 +20,6 @@ var SteamWebLogOn = require('steam-weblogon');
 var getSteamAPIKey = require('steam-web-api-key');
 var SteamTradeOffers = require('steam-tradeoffers');
 
-// put your steamid here so the bot can accept your offers
-var admin = '';
-
-var logOnOptions = {
-  account_name: '',
-  password: ''
-};
-
-var authCode = ''; // code received by email
 var sentryFileName = 'sentry'; // steam guard data file name
 
 try {
