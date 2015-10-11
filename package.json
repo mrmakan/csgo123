@@ -6,7 +6,7 @@
   "dependencies": {
     "steam": "*",
     "steam-tradeoffers": "*",
-    "steam-web-api-key": "0.0.1",
-    "steam-weblogon": "0.0.3"
+    "steam-web-api-key": "*",
+    "steam-weblogon": "*"
   }
 }
