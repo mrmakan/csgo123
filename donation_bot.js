@@ -100,6 +100,9 @@ function handleOffers() {
       && body.response.trade_offers_received
     ) {
       var descriptions = {};
+      
+      body.response.descriptions = body.response.descriptions || [];
+      
       body.response.descriptions.forEach(function (desc) {
         descriptions[
           desc.appid + ';' + desc.classid + ';' + desc.instanceid
