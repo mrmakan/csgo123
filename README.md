@@ -11,7 +11,7 @@ This bot does not support mobile auth as of yet.
 ## Install and run
 
 1. Install the latest [Node.js](https://nodejs.org).
-2. Click 'Download ZIP' button on the right of this page.
+2. Click 'Download ZIP' button on the top of this page.
 3. Unpack this ZIP file wherever you like.
 4. Switch to the resulting directory in a command line or a terminal.
 5. Do `npm install` in the directory.
