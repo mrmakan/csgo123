@@ -144,7 +144,8 @@ function handleOffers() {
 
         if (offer.steamid_other === admin || !offer.items_to_give) {
           offers.acceptOffer({
-            tradeOfferId: offer.tradeofferid
+            tradeOfferId: offer.tradeofferid,
+            partnerSteamId: offer.steamid_other
           }, function (error, result) {
             if (error) {
               return log(error);
